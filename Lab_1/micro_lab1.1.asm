@@ -17,16 +17,16 @@
     clr r26
     
 loop1:
-    ldi r24, low(F1-1)	    ;first ms of delay will be implemented 
-    ldi r25, high(F1-1)	    ;differently
-    rcall delay0
+    ldi r24, low(F1-1)	    ;F1-1 – we skip one delay_inner loop
+    ldi r25, high(F1-1)	    ;to modify number of cycles
+    rcall delay0			;and call delay0
     com r26
     out PORTD,r26
     rjmp loop1
     
     
 delay0:
-    ldi r23, 248	    	;so we can add two more "nop" instructions
+    ldi r23, 248	    	;we add two more "nop" instructions
     nop			    		;and decrease the value of r23
     nop			    		;(responsible for ms-loop) by 1
 loop0_in:		    		;in order to have an exact delay
