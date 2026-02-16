@@ -110,7 +110,7 @@ exit:
  reti
  
     
-;multiply by 3 a 16-bit value in registers r26:r27
+; multiply by 3 a 16-bit value in registers r26:r27
 multiplier:
     ldi r28, 3
 loop2:
@@ -124,7 +124,7 @@ loop2:
 exit3:
     ret
  
-;divide a 16-bit value in registers r30:r31 
+; divide a 16-bit value in registers r30:r31 
 divide:
     cp r30,r18
     brsh loop
@@ -154,12 +154,12 @@ exit_now:
     
 
  lcd_init:
- ldi r24 ,low(200) ;
+ ldi r24 ,low(200) 
  ldi r25 ,high(200) ; Wait 200 mSec
- rcall wait_msec ;
+ rcall wait_msec 
 
  ldi r24 ,0x30 ; command to switch to 8 bit mode
- out PORTD ,r24 ;
+ out PORTD ,r24 
  sbi PORTD ,PD3 ; Enable Pulse
  nop
  nop
