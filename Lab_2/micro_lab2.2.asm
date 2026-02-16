@@ -14,22 +14,23 @@ rjmp init
 rjmp ISR0
     
 init:    
-;Init Stack Pointer
+    ; Init Stack Pointer
     ldi r24, LOW(RAMEND)
     out SPL, r24
     ldi r24, HIGH(RAMEND)
     out SPL, r24
-    
+
+    ; enable INT0 on falling edge
     ldi r24, (1 << ISC01) | (0 << ISC00)
     sts EICRA, r24
     ldi r24, (1 << INT0)
     out EIMSK, r24
     
     ser r26		
-    out DDRC, r26		; init PC4-PC0 as output
+    out DDRC, r26		; PORTC as output
     
     
-    sei				; enable global interrupts
+    sei				    ; enable global interrupts
  
 ; main programm    
 main:
@@ -49,27 +50,27 @@ loop:
 
 ; interrupt routine
 ISR0:
-    cli				; disable interrupts
+    cli				        ; disable interrupts
     
-    ldi result, 0		; init the result register
-    in r17, PINB		; Read the state of the PORTB
-    com r17
-    ldi mask, 0b011111		; init mask register
-    ldi bits, 5			; PB4-PB0 pins
+    ldi result, 0		    ; initialize the result register
+    in r17, PINB		    ; read PORTB
+    com r17                 ; inverse logic input
+    ldi mask, 0b011111		; initialize mask register
+    ldi bits, 5			    ; bits to check
     
-    and r17, mask		; isolate PB4-PB0 bits
+    and r17, mask		    ; isolate PB4-PB0 bits
 int_loop:
     lsr r17			
-    brcc check			; if LSB is 1
-    inc result			; inc the result register
-    lsl result			; and shift left
+    brcc check			    ; if LSB is 1
+    inc result			    ; increment the result register
+    lsl result			    ; and shift left to check next bit
 check:    
-    dec bits			; else if there are more bits
-    brne int_loop		; repeat
+    dec bits			    ; else if there are more bits
+    brne int_loop		    ; repeat
 isr0_exit:
-    lsr result			; else shift the last "1" to LSB
+    lsr result			    ; else shift the last "1" to LSB
     out PORTC, result		; and show at the output PORTC
-    sei				; enable interrupts
+    sei				        ; enable interrupts
     reti
     
 ; delay routine    
