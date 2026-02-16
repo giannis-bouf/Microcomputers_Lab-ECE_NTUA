@@ -26,22 +26,22 @@ loop1:
     
     
 delay0:
-    ldi r23, 248	    ;so we can add two more "nop" instructions
-    nop			    ;and decrease the value of r23
-    nop			    ;(responsible for ms-loop) by 1
-loop0_in:		    ;in order to have an exact delay
+    ldi r23, 248	    	;so we can add two more "nop" instructions
+    nop			    		;and decrease the value of r23
+    nop			    		;(responsible for ms-loop) by 1
+loop0_in:		    		;in order to have an exact delay
     dec r23
     nop
     brne loop0_in
     
 delay_inner:		    
-    ldi	r23, 249	    ; (1 cycle)	
+    ldi	r23, 249	    	; 1 cycle	
 loop_inn:
-    dec r23		    ; 1 cycle
-    nop			    ; 1 cycle
-    brne loop_inn	    ; 1 or 2 cycles
+    dec r23		    		; 1 cycle
+    nop			    		; 1 cycle
+    brne loop_inn	    	; 1 or 2 cycles
      
-    sbiw r24 ,1		    ; 2 cycles
+    sbiw r24 ,1		    	; 2 cycles
     brne delay_inner	    ; 1 or 2 cycles
  
-    ret			    ;4 cycles
+    ret			    		; 4 cycles
