@@ -6,31 +6,34 @@ rjmp reset
 rjmp ISR1
     
 reset:
+    ; init Stack Pointer
     ldi r24, LOW(RAMEND)
     out SPL, r24
     ldi r24, HIGH(RAMEND)
     out SPL, r24
-    
+
+    ; enable INT1 on falling edge
     ldi r24, (1 << ISC01) | (0 << ISC00)
     sts EICRA, r24
     ldi r24, (1 << INT1)
     out EIMSK, r24
 
     ser r21           
-    out DDRB, r21 ;output
-    sei ;enable interrupts
+    out DDRB, r21                         ; PORTB as output
+    sei                                   ; enable interrupts
 main:    
     rjmp main
-    
+
+; interrupt routine
 ISR1:   
     ser r26
-    out PORTB, r26
-    call delay_half
+    out PORTB, r26                ; turn on all LEDs
+    call delay_half               ; delay 0.5 seconds
     ldi r26, 1
-    out PORTB, r26
-    call delay_three
+    out PORTB, r26                ; turn off the LEDs except PB0
+    call delay_three              ; delay 3 seconds
     clr r26 
-    out PORTB, r26
+    out PORTB, r26                ; turn off PB0 too
     reti
 
     
@@ -46,11 +49,12 @@ delay_three:
     call delay_ms
     ret
     
-;delay routine    
+; delay routine    
 delay_mS:
     ldi r23, 249
 loop_inn:
-    sei
+    sei                        ; allow delay routine to be interrupted
+                               ; start the interrupt routine all over again
     dec r23
     nop
     brne loop_inn
