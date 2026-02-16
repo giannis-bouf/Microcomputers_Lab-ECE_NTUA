@@ -4,11 +4,11 @@
 #include<avr/interrupt.h>
 #include<util/delay.h>
 
-#define PCA9555_0_ADDRESS 0x40 //A0=A1=A2=0 by hardware
-#define TWI_READ 1 // reading from twi device
-#define TWI_WRITE 0 // writing to twi device
-#define SCL_CLOCK 100000L // twi clock in Hz
-//Fscl=Fcpu/(16+2*TWBR0_VALUE*PRESCALER_VALUE)
+#define PCA9555_0_ADDRESS 0x40         // A0=A1=A2=0 by hardware
+#define TWI_READ 1                     // reading from twi device
+#define TWI_WRITE 0                    // writing to twi device
+#define SCL_CLOCK 100000L              // twi clock in Hz
+// Fscl=Fcpu/(16+2*TWBR0_VALUE*PRESCALER_VALUE)
 #define TWBR0_VALUE ((F_CPU/SCL_CLOCK)-16)/2
 
 // PCA9555 REGISTERS
@@ -39,8 +39,8 @@ typedef enum {
 
 //initialize TWI clock
 void twi_init(void) {
- TWSR0 = 0; // PRESCALER_VALUE=1
- TWBR0 = TWBR0_VALUE; // SCL_CLOCK 100KHz
+ TWSR0 = 0;                 // PRESCALER_VALUE=1
+ TWBR0 = TWBR0_VALUE;       // SCL_CLOCK 100KHz
 }
 
 // Read one byte from the twi device (request more data from device)
@@ -50,7 +50,7 @@ unsigned char twi_readAck(void) {
  return TWDR0;
 }
 
-//Read one byte from the twi device, read is followed by a stop condition
+// Read one byte from the twi device, read is followed by a stop condition
 unsigned char twi_readNak(void) {
 TWCR0 = (1<<TWINT) | (1<<TWEN);
 while(!(TWCR0 & (1<<TWINT)));
@@ -185,4 +185,5 @@ int main(void) {
  
  PCA9555_0_write(REG_OUTPUT_0, f0 | f1); // combine f0 and f1 and write result
  } 
+
 }
