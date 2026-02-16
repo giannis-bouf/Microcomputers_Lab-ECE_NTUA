@@ -11,37 +11,39 @@ init:
     out DDRD,r26
     out PORTD,r26   ;PortD is output
     
-    ldi r21, 0b00000001  ;initialize LED
-    bst r21, 7           ;Store the value of the 7th bit (T flag) into the T Register
+    ldi r21, 0b00000001  ;initialize LED - starting from the right
+    bst r21, 7           ;store MSB of led configuration
     out PORTD, r21
     call delayone
     jmp goleft    
-      
+                         ;flag set to 1 indicates direction should be changed
     
 goleft:
-    lsl r21  ;rotate left
-    bst r21, 7
+    lsl r21              ;rotate left
+    bst r21, 7           ;update flag
     out PORTD, r21
     call delayone
-    brtc goleft  ;if MSB not set continue
-    call delaytwo
-    jmp goright
+    brtc goleft          ;while flag is not set, repeat
+    call delaytwo        ;extra delay of two seconds
+                         ;change direction
      
 goright:
-    lsr r21  ;rotate right
-    bst r21, 0
+    lsr r21              ;rotate right
+    bst r21, 0           ;update flag
     out PORTD, r21
     call delayone
-    brtc goright  ;if LSB not set continue
+    brtc goright         ;while flag is not set, repeat
     call delaytwo
-    jmp goleft
+    jmp goleft           ;change direction
     
+;delay of 2 sec
 delaytwo:
     ldi r24, low(2000-1)
     ldi r25, high(2000-1)      
     call delay0
     ret
-    
+
+;delay of 1,5 sec  
 delayone: 
     ldi r24, low(1500-1)
     ldi r25, high(1500-1)      
@@ -57,18 +59,18 @@ loop0_in:
     nop
     brne loop0_in
      
-    ;total group delay 996 cycles
+;total group delay 996 cycles
 delay_inner:		    
-    ldi	r23, 249	    ; (1 cycle)	
+    ldi	r23, 249	     ; (1 cycle)	
 loop_inn:
-    dec r23		    ; 1 cycle
-    nop			    ; 1 cycle
+    dec r23		         ; 1 cycle
+    nop			            ; 1 cycle
     brne loop_inn	    ; 1 or 2 cycles
      
-    sbiw r24 ,1		    ; 2 cycles
-    brne delay_inner	    ; 1 or 2 cycles
+    sbiw r24 ,1		     ; 2 cycles
+    brne delay_inner	 ; 1 or 2 cycles
  
-    ret			    ;4 cycles
+    ret			            ;4 cycles
 
 
 
