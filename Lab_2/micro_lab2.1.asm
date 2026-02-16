@@ -10,26 +10,27 @@ rjmp init
 rjmp ISR1
     
 init:    
-;Init Stack Pointer
+	;Init Stack Pointer
     ldi r24, LOW(RAMEND)
     out SPL, r24
     ldi r24, HIGH(RAMEND)
     out SPL, r24
-    
+
+	; enable interrupt INT1 on falling edge
     ldi r24, (1 << ISC11) | (0 << ISC10)
     sts EICRA, r24
     ldi r24, (1 << INT1)
     out EIMSK, r24
     
     ser r26
-    out DDRB, r26		;init PORTB as output		
-    out DDRC, r26		;init PC4-PC0 as output
-    clr r16	    		;init interruption counter to 0
+    out DDRB, r26		; PORTB as output		
+    out DDRC, r26		; PORTB as output
+    clr r16	    		; interruption counter to 0
     out PORTC, r16
     
-    sei
+    sei					; enable global interrupts
  
-;main programm    
+; main programm    
 main:
     clr r26
 loop:
@@ -45,7 +46,7 @@ loop:
     breq main
     rjmp loop
 
-;delay routine    
+; delay routine    
 delay_mS:
     ldi r23, 249
 loop_inn:
@@ -58,25 +59,25 @@ loop_inn:
     
     ret
     
-;interrupt routine
+; interrupt routine
 ISR1:   
     ldi r24, (1 << INTF1)
-    out EIFR, r24
+    out EIFR, r24					; clear INTF1
     ldi r24, low(100*FOSC_MHZ)
     ldi r25, high(100*FOSC_MHZ)
-    rcall delay_mS
+    rcall delay_mS					; delay 100ms
     in r24, EIFR
-    cpi r24, 0
-    brne ISR1
+    cpi r24, 0						; INTF1 = 1 -> there’s been a debounce 
+    brne ISR1						; wait until there’s no debounce
     
-    in r17, PIND		; Read the state of the port with the button
-    sbrs r17, 6 			
-    rjmp isr1_exit		; Button is pressed, exit the ISR
+    in r17, PIND
+    sbrs r17, 6 					; if PD6 is pressed		
+    rjmp isr1_exit					; then exit the interrupt routine
 
-    inc r16	                ; increment counter
-    cpi r16, 32			; check if the counter reached 32
-    brne update_leds		; if not, update the LEDs
-    clr r16			; reset the counter to zero 
+    inc r16	                		; increment counter
+    cpi r16, 32						; check if the counter reached 32
+    brne update_leds				; if not, update the LEDs
+    clr r16							; reset the counter to zero 
     update_leds:
 	out PORTC, r16
     isr1_exit:            
